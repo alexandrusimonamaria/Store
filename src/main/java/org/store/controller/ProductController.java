@@ -1,15 +1,20 @@
 package org.store.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.store.dto.ProductDto;
-import org.store.entity.ProductEntity;
 import org.store.service.ProductService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/products")
 public class ProductController {
 
+    private static final Logger log = LoggerFactory.getLogger(ProductController.class);
     private final ProductService productService;
 
     public ProductController(ProductService productService) {
@@ -17,18 +22,37 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductEntity> createProduct(@RequestBody ProductDto productDto) {
-        ProductEntity productEntity = new ProductEntity();
-        productEntity.setName(productDto.name());
-        productEntity.setDescription(productDto.description());
-        productEntity.setPrice(productDto.price());
-        productEntity.setCategory(productDto.category());
-
-        return ResponseEntity.ok(productService.addProduct(productEntity));
+    public ResponseEntity<ProductDto> createProduct(@RequestBody @Valid ProductDto productDto) {
+        log.info("Create new product!");
+        return ResponseEntity.ok(ProductDto.fromEntity(productService.addProduct(productDto)));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductEntity> getProductById(@PathVariable Long id) {
-        return ResponseEntity.ok(productService.getProductById(id));
+    public ResponseEntity<ProductDto> getProductById(@PathVariable Long id) {
+        log.info("Getting product by id!");
+        return ResponseEntity.ok(ProductDto.fromEntity(productService.getProductById(id)));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProductDto>> getAllProducts() {
+        log.info("Getting all products!");
+        List<ProductDto> products = productService.getAllProducts()
+                .stream()
+                .map(ProductDto::fromEntity)
+                .toList();
+        return ResponseEntity.ok(products);
+    }
+
+    @PatchMapping("/{id}/price")
+    public ResponseEntity<ProductDto> updateProductPrice(@PathVariable Long id, @RequestParam Double newPrice) {
+        log.info("Updating product price!");
+        return ResponseEntity.ok(ProductDto.fromEntity(productService.updateProduct(id, newPrice)));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        log.info("Deleting product!");
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
     }
 }
