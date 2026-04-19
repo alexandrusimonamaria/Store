@@ -2,7 +2,6 @@ package org.store.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
 import org.store.entity.ProductEntity;
 
 public record ProductDto(
