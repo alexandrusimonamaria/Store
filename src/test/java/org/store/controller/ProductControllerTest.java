@@ -55,7 +55,7 @@ class ProductControllerTest {
         product.setPrice(4000.0);
         product.setCategory("Electronics");
 
-        productDto = new ProductDto("Laptop", "Gaming laptop", 4000.0, "Electronics");
+        productDto = new ProductDto(null, "Laptop", "Gaming laptop", 4000.0, "Electronics");
     }
 
     @Test
@@ -94,8 +94,8 @@ class ProductControllerTest {
         mockMvc.perform(post("/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(productDto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Laptop")) //check object content
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("Laptop"))
                 .andExpect(jsonPath("$.price").value(4000.0));
     }
 
@@ -123,7 +123,7 @@ class ProductControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void createProductWithInvalidBody() throws Exception {
-        ProductDto invalidDto = new ProductDto("", "desc", -10.0, "cat");
+        ProductDto invalidDto = new ProductDto(null, "", "desc", -10.0, "cat");
 
         mockMvc.perform(post("/products")
                         .contentType(MediaType.APPLICATION_JSON)

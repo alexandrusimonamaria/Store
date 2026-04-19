@@ -5,7 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import org.store.entity.ProductEntity;
 
 public record ProductDto(
-        @NotBlank
+        Long id,
+        @NotBlank(message = "Name of the product cannot be blank!")
         String name,
         @NotBlank
         String description,
@@ -14,7 +15,7 @@ public record ProductDto(
         @NotBlank
         String category) {
     public static ProductDto fromEntity(ProductEntity productEntity) {
-        return new ProductDto(productEntity.getName(), productEntity.getDescription(),
+        return new ProductDto(productEntity.getId(), productEntity.getName(), productEntity.getDescription(),
                 productEntity.getPrice(), productEntity.getCategory());
     }
 }

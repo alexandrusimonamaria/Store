@@ -3,13 +3,20 @@ package org.store.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+
 import org.store.dto.ProductDto;
 import org.store.service.ProductService;
 
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping("/products")
 public class ProductController {
@@ -24,7 +31,12 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<ProductDto> createProduct(@RequestBody @Valid ProductDto productDto) {
         log.info("Create new product!");
-        return ResponseEntity.ok(ProductDto.fromEntity(productService.addProduct(productDto)));
+        ProductDto createdProduct = ProductDto.fromEntity(productService.addProduct(productDto));
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(createdProduct.id())
+                .toUri();
+        return ResponseEntity.created(location).body(createdProduct);
     }
 
     @GetMapping("/{id}")
@@ -44,7 +56,7 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}/price")
-    public ResponseEntity<ProductDto> updateProductPrice(@PathVariable Long id, @RequestParam Double newPrice) {
+    public ResponseEntity<ProductDto> updateProductPrice(@PathVariable Long id, @RequestParam @Positive(message = "Price must be positive") Double newPrice) {
         log.info("Updating product price!");
         return ResponseEntity.ok(ProductDto.fromEntity(productService.updateProduct(id, newPrice)));
     }

@@ -3,7 +3,6 @@ package org.store.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-
 @Data
 @Entity(name = "PRODUCT")
 public class ProductEntity {

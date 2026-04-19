@@ -40,7 +40,7 @@ class ProductServiceTest {
         product.setPrice(4000.0);
         product.setCategory("Electronics");
 
-        productDto = new ProductDto("Laptop", "Gaming laptop", 4000.0, "Electronics");
+        productDto = new ProductDto(null, "Laptop", "Gaming laptop", 4000.0, "Electronics");
     }
 
     @Test
