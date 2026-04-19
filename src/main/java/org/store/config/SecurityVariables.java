@@ -17,7 +17,6 @@ public class SecurityVariables {
     @Value("${spring.security.admin.name}")
     private String adminName;
 
-
     @Value("${spring.security.admin.password}")
     private String adminPassword;
 }
