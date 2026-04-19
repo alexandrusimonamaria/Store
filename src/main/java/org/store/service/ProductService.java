@@ -52,7 +52,7 @@ public class ProductService {
     public void deleteProduct(Long id) {
         log.info("Deleting product: {}", id);
         if (!productRepository.existsById(id)) {
-            throw new ProductNotFoundException("Product not found!");
+            throw new ProductNotFoundException("Product with id " + id + " not found");
         }
         productRepository.deleteById(id);
     }
