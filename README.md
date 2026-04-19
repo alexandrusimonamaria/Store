@@ -1,41 +1,74 @@
-Store Management API
+# Store Management API
 
-Features:
+A REST API for managing store products, built with Spring Boot and Maven.
+> The application starts at `http://localhost:8080`.
 
-CRUD operations
-Basic Authentication with 2 roles: - ADMIN - all the CRUD operations & USER (can only see the products)
-                                   — add "local" in edit configuration → active profiles
-Using Record for DTO – to not directly expose the entity
-Validation input: @NotBlank, @Min
-H2 database:
-— http://localhost:8080/h2-console/
+## Features
 
-Security:
+- CRUD operations for products
+- DTO – using Java `Record` — entity not directly exposed
+- Input validation with `@NotBlank`, `@Min`
+- Error handling and logging
 
-Postman test: check in the Auth tab that you have a username and pass before you try to add/get etc.
-application-local.properties file contains passwords — added in .gitignore
-Explicit rules per HTTP method: GET → authenticated, POST/PATCH/DELETE - ADMIN only
+## Demo Credentials
 
-Testing:
+| Role  | Username | Password |
+|-------|----------|----------|
+| ADMIN | admin    | ##123    |
+| USER  | user     | 1234#    |
 
-Unit test for ProductService with Mockito
-Integration test for ProductController + security tests
+> Credentials are defined in `application.properties` for easy testing.
 
-Endpoints:
+## H2 Console
 
-GET: /products & /products/{id} – user and admin
-POST /products – admin
+```
+http://localhost:8080/h2-console/
+JDBC URL: jdbc:h2:mem:store_db
+Username: sa
+Password: (empty)
+```
+
+> Note: H2 console is disabled by default. To enable it, set `spring.h2.console.enabled=true` in
+`application.properties`.
+
+## API Endpoints
+
+| Method | Endpoint               | Role        | Description          |
+|--------|------------------------|-------------|----------------------|
+| GET    | `/products`            | USER, ADMIN | Get all products     |
+| GET    | `/products/{id}`       | USER, ADMIN | Get product by ID    | 
+| POST   | `/products`            | ADMIN       | Create new product   |
+| PATCH  | `/products/{id}/price` | ADMIN       | Update product price |
+| DELETE | `/products/{id}`       | ADMIN       | Delete product       |
+
+### POST /products — Request Body
+
+```json
 {
-"name": "Laptop",
-"description": "something",
-"price": 5000,
-"category": "Electronics"
+  "name": "Laptop",
+  "description": "something",
+  "price": 5000,
+  "category": "Electronics"
 }
-PATCH: /products/{id}/price – admin
-DELETE: /products/{id} – admin
+```
 
-Technologies:
-Java 21, Maven
-Spring Boot, Security, Data & Lombok
-H2 – database
-JUnit5 & Mockito
+## Security
+
+- Basic Authentication with two roles: `ADMIN` and `USER`
+- `GET` requests — accessible by both roles
+- `POST`, `PATCH`, `DELETE` — ADMIN only
+- Passwords hashed with `BCryptPasswordEncoder`
+
+When testing with Postman, set credentials in the Authorization tab – Basic Auth
+
+## Testing
+
+- Unit tests for `ProductService` with Mockito
+- Integration tests for `ProductController` including authentication scenarios
+
+## Technologies
+
+- Java 21, Maven
+- Spring Boot, Spring Security, Spring Data JPA, Lombok
+- H2 in-memory database
+- JUnit 5 & Mockito
