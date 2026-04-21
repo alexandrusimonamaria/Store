@@ -28,9 +28,6 @@ Username: sa
 Password: (empty)
 ```
 
-> Note: H2 console is disabled by default. To enable it, set `spring.h2.console.enabled=true` in
-`application.properties`.
-
 ## API Endpoints
 
 | Method | Endpoint               | Role        | Description          |
