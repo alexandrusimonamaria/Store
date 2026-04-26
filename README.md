@@ -38,6 +38,33 @@ Password: (empty)
 | PATCH  | `/products/{id}/price` | ADMIN       | Update product price |
 | DELETE | `/products/{id}`       | ADMIN       | Delete product       |
 
+## Pagination
+
+`GET /products` supports pagination via query parameters:
+
+| Parameter | Default | Description              |
+|-----------|---------|--------------------------|
+| `page`    | 0       | Page number (0-based)    |
+| `size`    | 10      | Number of items per page |
+
+Examples:
+```
+GET /products?page=0&size=5
+```
+
+Response includes pagination metadata:
+```json
+{
+  "content": ["..."],
+  "totalElements": 25,
+  "totalPages": 3,
+  "size": 10,
+  "number": 0,
+  "first": true,
+  "last": false
+}
+```
+
 ### POST /products — Request Body
 
 ```json
@@ -46,6 +73,25 @@ Password: (empty)
   "description": "something",
   "price": 5000,
   "category": "Electronics"
+}
+```
+
+## Health & Monitoring (Actuator)
+
+Spring Boot Actuator exposes monitoring endpoints — accessible without authentication:
+
+| Endpoint               | Description                            |
+|------------------------|----------------------------------------|
+| `GET /actuator/health` | Application status (`UP` / `DOWN`)     |
+
+Example response for `/actuator/health`:
+```json
+{
+  "status": "UP",
+  "components": {
+    "db": { "status": "UP" },
+    "diskSpace": { "status": "UP" }
+  }
 }
 ```
 
