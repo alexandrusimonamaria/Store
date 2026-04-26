@@ -18,4 +18,13 @@ public record ProductDto(
         return new ProductDto(productEntity.getId(), productEntity.getName(), productEntity.getDescription(),
                 productEntity.getPrice(), productEntity.getCategory());
     }
+
+    public ProductEntity toEntity() {
+        ProductEntity entity = new ProductEntity();
+        entity.setName(this.name);
+        entity.setDescription(this.description);
+        entity.setPrice(this.price);
+        entity.setCategory(this.category);
+        return entity;
+    }
 }

@@ -93,7 +93,7 @@ class ProductControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void createProductAdminRole() throws Exception {
-        when(productService.addProduct(any(ProductDto.class))).thenReturn(product);
+        when(productService.addProduct(any(ProductEntity.class))).thenReturn(product);
 
         mockMvc.perform(post("/products")
                         .contentType(MediaType.APPLICATION_JSON)

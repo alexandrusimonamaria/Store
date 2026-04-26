@@ -4,6 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -13,8 +16,6 @@ import java.net.URI;
 
 import org.store.dto.ProductDto;
 import org.store.service.ProductService;
-
-import java.util.List;
 
 @Validated
 @RestController
@@ -31,7 +32,7 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<ProductDto> createProduct(@RequestBody @Valid ProductDto productDto) {
         log.info("Create new product!");
-        ProductDto createdProduct = ProductDto.fromEntity(productService.addProduct(productDto));
+        ProductDto createdProduct = ProductDto.fromEntity(productService.addProduct(productDto.toEntity()));
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(createdProduct.id())
@@ -46,12 +47,9 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductDto>> getAllProducts() {
+    public ResponseEntity<Page<ProductDto>> getAllProducts(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
         log.info("Getting all products!");
-        List<ProductDto> products = productService.getAllProducts()
-                .stream()
-                .map(ProductDto::fromEntity)
-                .toList();
+        Page<ProductDto> products = productService.getAllProducts(pageable).map(ProductDto::fromEntity);
         return ResponseEntity.ok(products);
     }
 

@@ -2,13 +2,12 @@ package org.store.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.store.dto.ProductDto;
 import org.store.entity.ProductEntity;
 import org.store.exception.ProductNotFoundException;
 import org.store.repository.ProductRepository;
-
-import java.util.List;
 
 @Service
 public class ProductService {
@@ -26,19 +25,14 @@ public class ProductService {
                 .orElseThrow(() -> new ProductNotFoundException("Product with id " + id + " not found"));
     }
 
-    public ProductEntity addProduct(ProductDto productDto) {
-        ProductEntity entity = new ProductEntity();
-        entity.setName(productDto.name());
-        entity.setDescription(productDto.description());
-        entity.setPrice(productDto.price());
-        entity.setCategory(productDto.category());
+    public ProductEntity addProduct(ProductEntity entity) {
         log.info("Adding new product: {}", entity);
         return productRepository.save(entity);
     }
 
-    public List<ProductEntity> getAllProducts() {
+    public Page<ProductEntity> getAllProducts(Pageable pageable) {
         log.info("Getting all products from the database.");
-        return productRepository.findAll();
+        return productRepository.findAll(pageable);
     }
 
     public ProductEntity updateProduct(Long id, Double newPrice) {
