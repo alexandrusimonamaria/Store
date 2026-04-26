@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
@@ -23,6 +25,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import org.springframework.data.domain.Pageable;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -61,12 +64,13 @@ class ProductControllerTest {
     @Test
     @WithMockUser
     void getAllProductsUserAuthenticated() throws Exception {
-        when(productService.getAllProducts()).thenReturn(List.of(product));
+        when(productService.getAllProducts(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(product), PageRequest.of(0, 10), 1));
 
         mockMvc.perform(get("/products"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Laptop")) //check the element content from the list
-                .andExpect(jsonPath("$[0].price").value(4000.0));
+                .andExpect(jsonPath("$.content[0].name").value("Laptop"))
+                .andExpect(jsonPath("$.content[0].price").value(4000.0));
     }
 
     @Test
@@ -131,6 +135,14 @@ class ProductControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.name").exists())
                 .andExpect(jsonPath("$.price").exists());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void updateProductPriceWithNegativeValue() throws Exception {
+        mockMvc.perform(patch("/products/1/price")
+                        .param("newPrice", "-50.0"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

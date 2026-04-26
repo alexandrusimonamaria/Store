@@ -6,6 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.store.dto.ProductDto;
 import org.store.entity.ProductEntity;
 import org.store.exception.ProductNotFoundException;
@@ -66,7 +70,7 @@ class ProductServiceTest {
     void addProduct() {
         when(productRepository.save(any(ProductEntity.class))).thenReturn(product);
 
-        ProductEntity result = productService.addProduct(productDto);
+        ProductEntity result = productService.addProduct(product);
 
         assertThat(result.getName()).isEqualTo("Laptop");
         assertThat(result.getPrice()).isEqualTo(4000.0);
@@ -75,12 +79,13 @@ class ProductServiceTest {
 
     @Test
     void getAllProducts() {
-        when(productRepository.findAll()).thenReturn(List.of(product));
+        Pageable pageable = PageRequest.of(0, 10);
+        when(productRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(product)));
 
-        List<ProductEntity> result = productService.getAllProducts();
+        Page<ProductEntity> result = productService.getAllProducts(pageable);
 
-        assertThat(result).hasSize(1);
-        assertThat(result.getFirst().getName()).isEqualTo("Laptop");
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().getFirst().getName()).isEqualTo("Laptop");
     }
 
     @Test
